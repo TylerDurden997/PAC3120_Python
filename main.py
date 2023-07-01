@@ -46,13 +46,19 @@ def mostrar_valores_medidor(pac_3120, id):
     potencias_activas = pac_3120.get_active_power()
     potencias_reactivas = pac_3120.get_reactive_power()
     factores_potencias = pac_3120.get_power_factor()
-    potencia_trifasica = potencia_trifasica_total(potencias_activas,potencias_reactivas,factores_potencias)
-    potencia_trifasica_aparente_total = potencia_aparente_trifasica_total(potencias_activas,potencias_reactivas)
-    potencia_trifasica_aparente_total_linea = potencia_aparente_trifasica_total_linea(potencias_activas,potencias_reactivas)
-    print(f"-------------------------Datos Medidor {id}-------------------------")
-    print("Potencia Trifásica: ",potencia_trifasica)
-    print("Potencia Trifásica Aparente Total: ",potencia_trifasica_aparente_total)
-    print("Potencia Trifásica Aparente Total de Línea: ",potencia_trifasica_aparente_total_linea)
+    if potencias_activas == "Bad" or potencias_reactivas == "Bad" or factores_potencias =="Bad":
+        print("Los dispositivos no estan enlazados de manera correcta con la interfaz de Modbus Slave")
+        print("Revisar nuevamente la IP, puerto y Id de los dispositivos")
+        return "Bad"
+    else: 
+        potencia_trifasica = potencia_trifasica_total(potencias_activas,potencias_reactivas,factores_potencias)
+        potencia_trifasica_aparente_total = potencia_aparente_trifasica_total(potencias_activas,potencias_reactivas)
+        potencia_trifasica_aparente_total_linea = potencia_aparente_trifasica_total_linea(potencias_activas,potencias_reactivas)
+        print(f"-------------------------Datos Medidor {id}-------------------------")
+        print("Potencia Trifásica: ",potencia_trifasica)
+        print("Potencia Trifásica Aparente Total: ",potencia_trifasica_aparente_total)
+        print("Potencia Trifásica Aparente Total de Línea: ",potencia_trifasica_aparente_total_linea)
+        return "Good"
 
 if __name__ == '__main__':
     while True:
@@ -66,7 +72,7 @@ if __name__ == '__main__':
         elif seleccion == "1":
             print("Cargue la IP, puerto y Id del equipo a enlazar")
             print("Por ejemplo: 127.0.0.1,502,1")
-            print("Recuerde presionar la tecla q para salir del escaneo")
+            print("Recuerde presionar la tecla q varias veces para salir del escaneo")
             medidor_1 = input("Ingrese los datos del medidor 1: ")
             medidor_1 = medidor_1.split(",")
             medidor_2 = input("Ingrese los datos del medidor 2: ")
@@ -80,9 +86,12 @@ if __name__ == '__main__':
                     pac_3120_1 = Medidor(medidor_1[0],medidor_1[1],int(medidor_1[2]))
                     pac_3120_2 = Medidor(medidor_2[0],medidor_2[1],int(medidor_2[2]))
                     pac_3120_3 = Medidor(medidor_3[0],medidor_3[1],int(medidor_3[2]))
-                    mostrar_valores_medidor(pac_3120_1,medidor_1[2])
-                    mostrar_valores_medidor(pac_3120_2,medidor_2[2])
-                    mostrar_valores_medidor(pac_3120_3,medidor_3[2])
-                    time.sleep(1)
+                    status_medidor_1 = mostrar_valores_medidor(pac_3120_1,medidor_1[2])
+                    status_medidor_2 = mostrar_valores_medidor(pac_3120_2,medidor_2[2])
+                    status_medidor_3 = mostrar_valores_medidor(pac_3120_3,medidor_3[2])
+                    if status_medidor_1 == "Good" and status_medidor_2 == "Good" and status_medidor_3 == "Good":
+                        time.sleep(1)
+                    else:
+                        break
         else:
             print("Selección incorrecta, marque alguna de las anteriores")
