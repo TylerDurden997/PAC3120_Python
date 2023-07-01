@@ -1,11 +1,4 @@
-Primero instalar librerías para manejo de MODBUS:
-
-python -m pip install pymodbus
-
-python -m pip install pyModbusTCP
-
-python -m pip install minimalmodbus
-
-Segundo instalar librerías para manejo de menú de consola:
-
-pip install keyboard
+keyboard==0.13.5
+minimalmodbus==2.0.1
+pymodbus==3.3.2
+pyModbusTCP==0.2.0
